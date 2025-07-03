@@ -3,6 +3,21 @@ import { db } from './drizzle';
 import { activityLogs, teamMembers, teams, users } from './schema';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth/session';
+import bcrypt from 'bcrypt-ts';
+
+export async function getUserByEmail(email: string) {
+  const result = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, email))
+    .limit(1);
+
+  return result[0] ?? null;
+}
+
+export async function validatePassword(plainPassword: string, hashedPassword: string) {
+  return bcrypt.compare(plainPassword, hashedPassword);
+}
 
 export async function getUser() {
   const sessionCookie = (await cookies()).get('session');
